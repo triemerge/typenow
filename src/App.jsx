@@ -1,12 +1,14 @@
-function App() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">TypeNow</h1>
-        <p className="text-gray-500 mt-2">typing speed test</p>
-      </div>
-    </div>
-  )
-}
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./Index";
+import NotFound from "./NotFound";
 
-export default App
+const App = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
+);
+
+export default App;
