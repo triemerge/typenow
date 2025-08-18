@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "./components/ThemeProvider";
-import { ThemeToggle } from "./components/ThemeToggle";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import Index from "./Index";
 import NotFound from "./NotFound";
 
