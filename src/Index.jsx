@@ -1,11 +1,31 @@
+import React, { useState } from 'react';
+import { TypingTest } from '@/components/TypingTest';
+
 const Index = () => {
+  const [results, setResults] = useState(null);
+
+  const handleComplete = (res) => {
+    setResults(res);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-[80vh]">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">TypeNow</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">typing speed test</p>
-      </div>
-    </div>
+    <main className="container max-w-6xl mx-auto px-4 py-8">
+      {results ? (
+        <div className="text-center space-y-4">
+          <h2 className="text-3xl font-bold">Test Complete!</h2>
+          <p className="text-xl">WPM: {results.wpm}</p>
+          <p className="text-xl">Accuracy: {results.accuracy}%</p>
+          <button
+            onClick={() => setResults(null)}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : (
+        <TypingTest onComplete={handleComplete} />
+      )}
+    </main>
   );
 };
 
