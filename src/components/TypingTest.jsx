@@ -11,28 +11,39 @@ export const TypingTest = ({ onComplete }) => {
   const [correctChars, setCorrectChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
   const inputRef = useRef(null);
+  const correctCharsRef = useRef(0);
+  const totalCharsRef = useRef(0);
+
+  useEffect(() => { correctCharsRef.current = correctChars; }, [correctChars]);
+  useEffect(() => { totalCharsRef.current = totalChars; }, [totalChars]);
 
   useEffect(() => {
     initWords();
   }, [initWords]);
 
   useEffect(() => {
+    let intervalId;
     if (hasStarted && timeRemaining > 0) {
-      const timer = setInterval(() => {
+      intervalId = setInterval(() => {
         setTimeRemaining(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            const wpm = Math.round((correctChars / 5) / (30 / 60));
-            const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 0;
-            onComplete({ wpm, accuracy, duration: 30, totalChars, correctChars });
-            return 0;
+          const newTime = prev - 1;
+          if (newTime === 0) {
+            const wpm = Math.round((correctCharsRef.current / 5) / (30 / 60));
+            const accuracy = totalCharsRef.current > 0
+              ? Math.round((correctCharsRef.current / totalCharsRef.current) * 100)
+              : 0;
+            onComplete({
+              wpm, accuracy, duration: 30,
+              totalChars: totalCharsRef.current,
+              correctChars: correctCharsRef.current,
+            });
           }
-          return prev - 1;
+          return newTime;
         });
       }, 1000);
-      return () => clearInterval(timer);
     }
-  }, [hasStarted, timeRemaining, correctChars, totalChars, onComplete]);
+    return () => { if (intervalId) clearInterval(intervalId); };
+  }, [hasStarted, timeRemaining, onComplete]);
 
   const handleKeyDown = (e) => {
     if (!hasStarted) setHasStarted(true);
