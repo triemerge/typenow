@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TypingDisplay } from './TypingDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
 
 export const TypingTest = ({ onComplete }) => {
   const { words, initWords } = useTypingTest();
+  const [timeLimit, setTimeLimit] = useState(30);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [timeRemaining, setTimeRemaining] = useState(30);
@@ -28,12 +30,12 @@ export const TypingTest = ({ onComplete }) => {
         setTimeRemaining(prev => {
           const newTime = prev - 1;
           if (newTime === 0) {
-            const wpm = Math.round((correctCharsRef.current / 5) / (30 / 60));
+            const wpm = Math.round((correctCharsRef.current / 5) / (timeLimit / 60));
             const accuracy = totalCharsRef.current > 0
               ? Math.round((correctCharsRef.current / totalCharsRef.current) * 100)
               : 0;
             onComplete({
-              wpm, accuracy, duration: 30,
+              wpm, accuracy, duration: timeLimit,
               totalChars: totalCharsRef.current,
               correctChars: correctCharsRef.current,
             });
@@ -43,7 +45,13 @@ export const TypingTest = ({ onComplete }) => {
       }, 1000);
     }
     return () => { if (intervalId) clearInterval(intervalId); };
-  }, [hasStarted, timeRemaining, onComplete]);
+  }, [hasStarted, timeRemaining, timeLimit, onComplete]);
+
+  const handleTimeLimitChange = (value) => {
+    const newLimit = parseInt(value);
+    setTimeLimit(newLimit);
+    setTimeRemaining(newLimit);
+  };
 
   const handleKeyDown = (e) => {
     if (!hasStarted) setHasStarted(true);
@@ -67,8 +75,21 @@ export const TypingTest = ({ onComplete }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-4" onClick={() => inputRef.current?.focus()}>
-      <div className="text-2xl font-bold text-primary text-center">
-        {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+      <div className="flex justify-between items-center">
+        <Select value={timeLimit.toString()} onValueChange={handleTimeLimitChange} disabled={hasStarted}>
+          <SelectTrigger className="w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="30">30 seconds</SelectItem>
+            <SelectItem value="60">60 seconds</SelectItem>
+            <SelectItem value="120">120 seconds</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="text-2xl font-bold text-primary">
+          {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+        </div>
       </div>
 
       <TypingDisplay
