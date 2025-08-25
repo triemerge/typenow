@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RotateCcw } from 'lucide-react';
 import { TypingDisplay } from './TypingDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
 
 export const TypingTest = ({ onComplete }) => {
-  const { words, initWords } = useTypingTest();
+  const { words, initWords, generateWords } = useTypingTest();
   const [timeLimit, setTimeLimit] = useState(30);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
@@ -53,6 +55,17 @@ export const TypingTest = ({ onComplete }) => {
     setTimeRemaining(newLimit);
   };
 
+  const resetTest = () => {
+    setHasStarted(false);
+    setTimeRemaining(timeLimit);
+    setCurrentWordIndex(0);
+    setUserInput('');
+    setCorrectChars(0);
+    setTotalChars(0);
+    initWords();
+    inputRef.current?.focus();
+  };
+
   const handleKeyDown = (e) => {
     if (!hasStarted) setHasStarted(true);
 
@@ -76,20 +89,27 @@ export const TypingTest = ({ onComplete }) => {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-4" onClick={() => inputRef.current?.focus()}>
       <div className="flex justify-between items-center">
-        <Select value={timeLimit.toString()} onValueChange={handleTimeLimitChange} disabled={hasStarted}>
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="30">30 seconds</SelectItem>
-            <SelectItem value="60">60 seconds</SelectItem>
-            <SelectItem value="120">120 seconds</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-4">
+          <Select value={timeLimit.toString()} onValueChange={handleTimeLimitChange} disabled={hasStarted}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30">30 seconds</SelectItem>
+              <SelectItem value="60">60 seconds</SelectItem>
+              <SelectItem value="120">120 seconds</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <div className="text-2xl font-bold text-primary">
-          {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+          <div className="text-2xl font-bold text-primary">
+            {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+          </div>
         </div>
+
+        <Button onClick={resetTest} variant="outline" size="sm" className="gap-2">
+          <RotateCcw size={16} />
+          Reset
+        </Button>
       </div>
 
       <TypingDisplay
