@@ -6,9 +6,10 @@ import { TypingDisplay } from './TypingDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
 
 export const TypingTest = ({ onComplete }) => {
-  const { words, initWords, generateWords } = useTypingTest();
+  const { words, initWords } = useTypingTest();
   const [timeLimit, setTimeLimit] = useState(30);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [timeRemaining, setTimeRemaining] = useState(30);
   const [hasStarted, setHasStarted] = useState(false);
@@ -40,6 +41,7 @@ export const TypingTest = ({ onComplete }) => {
               wpm, accuracy, duration: timeLimit,
               totalChars: totalCharsRef.current,
               correctChars: correctCharsRef.current,
+              timestamp: new Date(),
             });
           }
           return newTime;
@@ -59,6 +61,7 @@ export const TypingTest = ({ onComplete }) => {
     setHasStarted(false);
     setTimeRemaining(timeLimit);
     setCurrentWordIndex(0);
+    setCurrentCharIndex(0);
     setUserInput('');
     setCorrectChars(0);
     setTotalChars(0);
@@ -72,15 +75,21 @@ export const TypingTest = ({ onComplete }) => {
     if (e.key === ' ') {
       e.preventDefault();
       setCurrentWordIndex(prev => prev + 1);
+      setCurrentCharIndex(0);
       setUserInput('');
     } else if (e.key === 'Backspace') {
-      setUserInput(prev => prev.slice(0, -1));
+      e.preventDefault();
+      if (currentCharIndex > 0) {
+        setCurrentCharIndex(prev => prev - 1);
+        setUserInput(prev => prev.slice(0, -1));
+      }
     } else if (e.key.length === 1) {
       const newInput = userInput + e.key;
       setUserInput(newInput);
+      setCurrentCharIndex(prev => prev + 1);
       setTotalChars(prev => prev + 1);
       const currentWord = words[currentWordIndex];
-      if (currentWord && userInput.length < currentWord.length && e.key === currentWord[userInput.length]) {
+      if (currentWord && currentCharIndex < currentWord.length && e.key === currentWord[currentCharIndex]) {
         setCorrectChars(prev => prev + 1);
       }
     }
@@ -115,6 +124,7 @@ export const TypingTest = ({ onComplete }) => {
       <TypingDisplay
         words={words}
         currentWordIndex={currentWordIndex}
+        currentCharIndex={currentCharIndex}
         userInput={userInput}
       />
 
@@ -127,7 +137,7 @@ export const TypingTest = ({ onComplete }) => {
       />
 
       {!hasStarted && (
-        <p className="text-center text-gray-400 text-sm">start typing to begin</p>
+        <p className="text-center text-muted-foreground/60 text-sm">start typing to begin</p>
       )}
     </div>
   );

@@ -1,24 +1,39 @@
 import React from 'react';
 
-export const TypingDisplay = ({ words, currentWordIndex, userInput }) => {
+export const TypingDisplay = ({ words, currentWordIndex, currentCharIndex, userInput }) => {
   if (!words || words.length === 0) return null;
 
-  return (
-    <div className="bg-card border border-border rounded-lg p-8 font-mono text-lg leading-relaxed">
-      <div className="flex flex-wrap gap-2">
-        {words.slice(0, 50).map((word, index) => {
-          let className = 'text-gray-400';
-          if (index < currentWordIndex) {
-            className = 'text-green-500';
-          } else if (index === currentWordIndex) {
-            className = 'text-foreground underline';
+  const renderWord = (word, wordIndex) => {
+    const isCurrentWord = wordIndex === currentWordIndex;
+    const isPastWord = wordIndex < currentWordIndex;
+
+    return (
+      <span key={wordIndex}>
+        {word.split('').map((char, charIndex) => {
+          let className = 'text-dim';
+
+          if (isCurrentWord) {
+            if (charIndex < userInput.length) {
+              className = userInput[charIndex] === char ? 'text-correct' : 'text-incorrect';
+            } else if (charIndex === currentCharIndex) {
+              className = 'text-dim border-b-2 border-primary';
+            }
+          } else if (isPastWord) {
+            className = 'text-correct';
           }
+
           return (
-            <span key={index} className={className}>
-              {word}
-            </span>
+            <span key={charIndex} className={className}>{char}</span>
           );
         })}
+      </span>
+    );
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-lg p-8 font-mono text-xl leading-relaxed">
+      <div className="flex flex-wrap gap-3">
+        {words.slice(0, 60).map((word, index) => renderWord(word, index))}
       </div>
     </div>
   );
