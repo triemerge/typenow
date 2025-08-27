@@ -14,7 +14,13 @@ export const getTestResults = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return [];
-    return JSON.parse(stored);
+
+    const parsed = JSON.parse(stored);
+    // Ensure timestamps are Date objects
+    return parsed.map((result) => ({
+      ...result,
+      timestamp: new Date(result.timestamp),
+    }));
   } catch (error) {
     console.error('Failed to load test results:', error);
     return [];
