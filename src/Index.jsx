@@ -1,29 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TypingTest } from '@/components/TypingTest';
+import { Results } from '@/components/Results';
+import { saveTestResult, getTestResults } from '@/utils/storage';
 
 const Index = () => {
-  const [results, setResults] = useState(null);
+  const [currentState, setCurrentState] = useState('test');
+  const [currentResults, setCurrentResults] = useState(null);
+  const [savedResults, setSavedResults] = useState([]);
+  const [isResultSaved, setIsResultSaved] = useState(false);
 
-  const handleComplete = (res) => {
-    setResults(res);
+  useEffect(() => {
+    setSavedResults(getTestResults());
+  }, []);
+
+  const handleTestComplete = (results) => {
+    setCurrentResults(results);
+    setCurrentState('results');
+    setIsResultSaved(false);
+  };
+
+  const handleRetakeTest = () => {
+    setCurrentResults(null);
+    setCurrentState('test');
+    setIsResultSaved(false);
+  };
+
+  const handleSaveResults = () => {
+    if (currentResults && !isResultSaved) {
+      saveTestResult(currentResults);
+      setSavedResults(getTestResults());
+      setIsResultSaved(true);
+    }
   };
 
   return (
     <main className="container max-w-6xl mx-auto px-4 py-8">
-      {results ? (
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold">Test Complete!</h2>
-          <p className="text-xl">WPM: {results.wpm}</p>
-          <p className="text-xl">Accuracy: {results.accuracy}%</p>
-          <button
-            onClick={() => setResults(null)}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-          >
-            Try Again
-          </button>
-        </div>
-      ) : (
-        <TypingTest onComplete={handleComplete} />
+      {currentState === 'test' && (
+        <TypingTest onComplete={handleTestComplete} />
+      )}
+
+      {currentState === 'results' && currentResults && (
+        <Results
+          results={currentResults}
+          onRetakeTest={handleRetakeTest}
+          onSaveResults={handleSaveResults}
+          isResultSaved={isResultSaved}
+        />
       )}
     </main>
   );
