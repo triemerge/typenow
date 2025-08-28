@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -7,6 +8,7 @@ import NotFound from "./NotFound";
 
 const App = () => (
   <ThemeProvider>
+    <Toaster />
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
       <BrowserRouter>

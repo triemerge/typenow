@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TypingTest } from '@/components/TypingTest';
 import { Results } from '@/components/Results';
 import { saveTestResult, getTestResults } from '@/utils/storage';
+import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [currentState, setCurrentState] = useState('test');
@@ -30,11 +31,15 @@ const Index = () => {
       saveTestResult(currentResults);
       setSavedResults(getTestResults());
       setIsResultSaved(true);
+      toast({
+        title: "Results Saved!",
+        description: "Your test results have been saved.",
+      });
     }
   };
 
   return (
-    <main className="container max-w-6xl mx-auto px-4 py-8">
+    <main className="flex-1 container max-w-6xl mx-auto px-4 py-8">
       {currentState === 'test' && (
         <TypingTest onComplete={handleTestComplete} />
       )}
