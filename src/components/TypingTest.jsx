@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RotateCcw } from 'lucide-react';
@@ -6,97 +6,27 @@ import { TypingDisplay } from './TypingDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
 
 export const TypingTest = ({ onComplete }) => {
-  const { words, initWords } = useTypingTest();
-  const [timeLimit, setTimeLimit] = useState(30);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [userInput, setUserInput] = useState('');
-  const [timeRemaining, setTimeRemaining] = useState(30);
-  const [hasStarted, setHasStarted] = useState(false);
-  const [correctChars, setCorrectChars] = useState(0);
-  const [totalChars, setTotalChars] = useState(0);
-  const inputRef = useRef(null);
-  const correctCharsRef = useRef(0);
-  const totalCharsRef = useRef(0);
-
-  useEffect(() => { correctCharsRef.current = correctChars; }, [correctChars]);
-  useEffect(() => { totalCharsRef.current = totalChars; }, [totalChars]);
-
-  useEffect(() => {
-    initWords();
-  }, [initWords]);
-
-  useEffect(() => {
-    let intervalId;
-    if (hasStarted && timeRemaining > 0) {
-      intervalId = setInterval(() => {
-        setTimeRemaining(prev => {
-          const newTime = prev - 1;
-          if (newTime === 0) {
-            const wpm = Math.round((correctCharsRef.current / 5) / (timeLimit / 60));
-            const accuracy = totalCharsRef.current > 0
-              ? Math.round((correctCharsRef.current / totalCharsRef.current) * 100)
-              : 0;
-            onComplete({
-              wpm, accuracy, duration: timeLimit,
-              totalChars: totalCharsRef.current,
-              correctChars: correctCharsRef.current,
-              timestamp: new Date(),
-            });
-          }
-          return newTime;
-        });
-      }, 1000);
-    }
-    return () => { if (intervalId) clearInterval(intervalId); };
-  }, [hasStarted, timeRemaining, timeLimit, onComplete]);
+  const {
+    timeLimit,
+    timeRemaining,
+    hasStarted,
+    currentWordIndex,
+    currentCharIndex,
+    userInput,
+    words,
+    typedWords,
+    setTimeLimit,
+    resetTest,
+    handleKeyPress,
+    inputRef,
+  } = useTypingTest(onComplete);
 
   const handleTimeLimitChange = (value) => {
-    const newLimit = parseInt(value);
-    setTimeLimit(newLimit);
-    setTimeRemaining(newLimit);
-  };
-
-  const resetTest = () => {
-    setHasStarted(false);
-    setTimeRemaining(timeLimit);
-    setCurrentWordIndex(0);
-    setCurrentCharIndex(0);
-    setUserInput('');
-    setCorrectChars(0);
-    setTotalChars(0);
-    initWords();
-    inputRef.current?.focus();
-  };
-
-  const handleKeyDown = (e) => {
-    if (!hasStarted) setHasStarted(true);
-
-    if (e.key === ' ') {
-      e.preventDefault();
-      setCurrentWordIndex(prev => prev + 1);
-      setCurrentCharIndex(0);
-      setUserInput('');
-    } else if (e.key === 'Backspace') {
-      e.preventDefault();
-      if (currentCharIndex > 0) {
-        setCurrentCharIndex(prev => prev - 1);
-        setUserInput(prev => prev.slice(0, -1));
-      }
-    } else if (e.key.length === 1) {
-      const newInput = userInput + e.key;
-      setUserInput(newInput);
-      setCurrentCharIndex(prev => prev + 1);
-      setTotalChars(prev => prev + 1);
-      const currentWord = words[currentWordIndex];
-      if (currentWord && currentCharIndex < currentWord.length && e.key === currentWord[currentCharIndex]) {
-        setCorrectChars(prev => prev + 1);
-      }
-    }
+    setTimeLimit(parseInt(value));
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4" onClick={() => inputRef.current?.focus()}>
+    <div className="w-full max-w-4xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Select value={timeLimit.toString()} onValueChange={handleTimeLimitChange} disabled={hasStarted}>
@@ -121,20 +51,26 @@ export const TypingTest = ({ onComplete }) => {
         </Button>
       </div>
 
-      <TypingDisplay
-        words={words}
-        currentWordIndex={currentWordIndex}
-        currentCharIndex={currentCharIndex}
-        userInput={userInput}
-      />
+      <div onClick={() => inputRef.current?.focus()} className="cursor-text">
+        <TypingDisplay
+          words={words}
+          currentWordIndex={currentWordIndex}
+          currentCharIndex={currentCharIndex}
+          userInput={userInput}
+          typedWords={typedWords}
+        />
 
-      <input
-        ref={inputRef}
-        className="opacity-0 absolute"
-        onKeyDown={handleKeyDown}
-        autoFocus
-        autoComplete="off"
-      />
+        <input
+          ref={inputRef}
+          className="opacity-0 absolute"
+          onKeyDown={handleKeyPress}
+          autoFocus
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+        />
+      </div>
 
       {!hasStarted && (
         <p className="text-center text-muted-foreground/60 text-sm">start typing to begin</p>
