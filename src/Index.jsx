@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { TypingTest } from '@/components/TypingTest';
 import { Results } from '@/components/Results';
-import { saveTestResult, getTestResults } from '@/utils/storage';
+import { Progress } from '@/components/Progress';
+import { saveTestResult, getTestResults, clearTestResults } from '@/utils/storage';
 import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -33,27 +34,31 @@ const Index = () => {
       setIsResultSaved(true);
       toast({
         title: "Results Saved!",
-        description: "Your test results have been saved.",
+        description: "Your test results have been saved to track your progress.",
       });
     }
   };
 
-  return (
-    <main className="flex-1 container max-w-6xl mx-auto px-4 py-8">
-      {currentState === 'test' && (
-        <TypingTest onComplete={handleTestComplete} />
-      )}
+  const handleViewProgress = () => {
+    setCurrentState('progress');
+  };
 
-      {currentState === 'results' && currentResults && (
-        <Results
-          results={currentResults}
-          onRetakeTest={handleRetakeTest}
-          onSaveResults={handleSaveResults}
-          isResultSaved={isResultSaved}
-        />
-      )}
-    </main>
-  );
+  const handleClearData = () => {
+    clearTestResults();
+    setSavedResults([]);
+    toast({
+      title: "Data Cleared",
+      description: "All saved test results have been removed.",
+    });
+  };
+
+  const handleBackToTest = () => {
+    setCurrentState('test');
+  };
+
+  return { currentState, handleTestComplete, handleRetakeTest, handleSaveResults,
+    handleViewProgress, handleClearData, handleBackToTest, currentResults,
+    savedResults, isResultSaved };
 };
 
 export default Index;
