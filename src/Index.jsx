@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TypingTest } from '@/components/TypingTest';
 import { Results } from '@/components/Results';
 import { Progress } from '@/components/Progress';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { saveTestResult, getTestResults, clearTestResults } from '@/utils/storage';
 import { toast } from '@/hooks/use-toast';
 
@@ -56,9 +58,40 @@ const Index = () => {
     setCurrentState('test');
   };
 
-  return { currentState, handleTestComplete, handleRetakeTest, handleSaveResults,
-    handleViewProgress, handleClearData, handleBackToTest, currentResults,
-    savedResults, isResultSaved };
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header
+        currentState={currentState}
+        onBackToTest={handleBackToTest}
+        onViewProgress={handleViewProgress}
+      />
+
+      <main className="flex-1 container max-w-6xl mx-auto px-4 py-8">
+        {currentState === 'test' && (
+          <TypingTest onComplete={handleTestComplete} />
+        )}
+
+        {currentState === 'results' && currentResults && (
+          <Results
+            results={currentResults}
+            onRetakeTest={handleRetakeTest}
+            onSaveResults={handleSaveResults}
+            isResultSaved={isResultSaved}
+          />
+        )}
+
+        {currentState === 'progress' && (
+          <Progress
+            results={savedResults}
+            onClearData={handleClearData}
+            onBackToTest={handleBackToTest}
+          />
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  );
 };
 
 export default Index;
