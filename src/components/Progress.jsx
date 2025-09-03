@@ -1,7 +1,9 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Trophy, Target, Trash2 } from 'lucide-react';
+import { TrendingUp, Trophy, Target, Trash2, Calendar } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 
 export const Progress = ({
   results,
@@ -17,9 +19,7 @@ export const Progress = ({
           <p className="text-muted-foreground mb-6">
             Take some typing tests to see your progress here
           </p>
-          <Button onClick={onBackToTest}>
-            Start Your First Test
-          </Button>
+          <Button onClick={onBackToTest}>Start Your First Test</Button>
         </Card>
       </div>
     );
@@ -30,9 +30,20 @@ export const Progress = ({
   const bestWpm = Math.max(...results.map(r => r.wpm));
   const bestAccuracy = Math.max(...results.map(r => r.accuracy));
 
+  const chartData = results.slice(-20).map((result, index) => ({
+    test: index + 1,
+    wpm: result.wpm,
+    accuracy: result.accuracy,
+  }));
+
+  const chartConfig = {
+    wpm: { label: "WPM", color: "hsl(var(--primary))" },
+    accuracy: { label: "Accuracy %", color: "hsl(var(--accent))" },
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-primary">Performance Analytics</h2>
           <p className="text-muted-foreground">
@@ -76,8 +87,27 @@ export const Progress = ({
         </Card>
       </div>
 
+      <Card className="p-6">
+        <h3 className="text-lg font-bold mb-4">Performance Trend</h3>
+        <ChartContainer config={chartConfig} className="h-[250px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="test" axisLine={false} tickLine={false} />
+              <YAxis axisLine={false} tickLine={false} />
+              <Tooltip content={<ChartTooltipContent />} />
+              <Line type="monotone" dataKey="wpm" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 4 }} />
+              <Line type="monotone" dataKey="accuracy" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ fill: "hsl(var(--accent))", r: 4 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </Card>
+
       <Card className="p-4">
-        <h3 className="text-lg font-bold mb-4">Session History</h3>
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Calendar className="h-5 w-5" />
+          Session History
+        </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
