@@ -2,27 +2,44 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Target, RotateCcw, Save, Clock } from 'lucide-react';
+import { Trophy, Target, Clock, RotateCcw, Save } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 
 export const Results = ({
   results,
+  previousResults,
   onRetakeTest,
   onSaveResults,
   isResultSaved = false,
 }) => {
-  const getWpmLabel = (wpm) => {
-    if (wpm >= 70) return 'Excellent';
-    if (wpm >= 50) return 'Good';
-    if (wpm >= 30) return 'Average';
-    return 'Needs Practice';
-  };
+  const chartData = previousResults.slice(-10).map((result, index) => ({
+    test: index + 1,
+    wpm: result.wpm,
+    accuracy: result.accuracy,
+  }));
+  chartData.push({
+    test: chartData.length + 1,
+    wpm: results.wpm,
+    accuracy: results.accuracy,
+  });
 
   const getWpmVariant = (wpm) => {
     if (wpm >= 60) return 'success';
     if (wpm >= 30) return 'warning';
     return 'error';
   };
-
+  const getWpmLabel = (wpm) => {
+    if (wpm >= 70) return 'Excellent';
+    if (wpm >= 50) return 'Good';
+    if (wpm >= 30) return 'Average';
+    return 'Needs Practice';
+  };
+  const getAccVariant = (acc) => {
+    if (acc >= 95) return 'success';
+    if (acc >= 80) return 'warning';
+    return 'error';
+  };
   const getAccLabel = (acc) => {
     if (acc >= 95) return 'Excellent';
     if (acc >= 90) return 'Good';
@@ -30,10 +47,9 @@ export const Results = ({
     return 'Needs Work';
   };
 
-  const getAccVariant = (acc) => {
-    if (acc >= 95) return 'success';
-    if (acc >= 80) return 'warning';
-    return 'error';
+  const chartConfig = {
+    wpm: { label: "WPM", color: "hsl(var(--primary))" },
+    accuracy: { label: "Accuracy", color: "hsl(var(--accent))" },
   };
 
   return (
@@ -96,12 +112,30 @@ export const Results = ({
         </div>
       </Card>
 
+      {chartData.length > 1 && (
+        <Card className="p-6">
+          <h3 className="text-lg font-bold mb-4">Performance Trend</h3>
+          <ChartContainer config={chartConfig} className="h-[200px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="test" axisLine={false} tickLine={false} fontSize={12} />
+                <YAxis axisLine={false} tickLine={false} fontSize={12} />
+                <Tooltip content={<ChartTooltipContent />} />
+                <Line type="monotone" dataKey="wpm" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 3 }} />
+                <Line type="monotone" dataKey="accuracy" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ fill: "hsl(var(--accent))", r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </Card>
+      )}
+
       <div className="flex gap-4 justify-center">
         <Button onClick={onRetakeTest} className="gap-2">
           <RotateCcw size={18} />
           Retake Test
         </Button>
-        <Button onClick={onSaveResults} variant="outline" className="gap-2" disabled={isResultSaved}>
+        <Button onClick={onSaveResults} variant="outline" className="gap-2 border-2" disabled={isResultSaved}>
           <Save size={18} />
           {isResultSaved ? 'Results Saved' : 'Save Results'}
         </Button>

@@ -74,6 +74,7 @@ const Index = () => {
         {currentState === 'results' && currentResults && (
           <Results
             results={currentResults}
+            previousResults={savedResults}
             onRetakeTest={handleRetakeTest}
             onSaveResults={handleSaveResults}
             isResultSaved={isResultSaved}
