@@ -4,6 +4,7 @@ import { Results } from '@/components/Results';
 import { Progress } from '@/components/Progress';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { StatsCards } from '@/components/StatsCards';
 import { saveTestResult, getTestResults, clearTestResults } from '@/utils/storage';
 import { toast } from '@/hooks/use-toast';
 
@@ -68,7 +69,10 @@ const Index = () => {
 
       <main className="flex-1 container max-w-6xl mx-auto px-4 py-8">
         {currentState === 'test' && (
-          <TypingTest onComplete={handleTestComplete} />
+          <div className="space-y-8">
+            <StatsCards results={savedResults} />
+            <TypingTest onComplete={handleTestComplete} />
+          </div>
         )}
 
         {currentState === 'results' && currentResults && (
