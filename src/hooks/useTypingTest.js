@@ -23,11 +23,20 @@ const COMMON_WORDS = [
   'pilot', 'chef', 'farmer', 'coder', 'maker', 'owner', 'buyer',
   'guest', 'host', 'child', 'adult', 'human', 'group', 'team',
   'friend', 'leader', 'member', 'agent', 'user', 'admin', 'staff',
+  'guard', 'queen', 'king', 'prince', 'saint', 'angel', 'robot',
+  'alien', 'giant', 'dwarf', 'fairy', 'witch', 'ghost', 'beast',
+  'horse', 'camel', 'tiger', 'zebra', 'koala', 'panda', 'eagle',
+  'snake', 'shark', 'whale', 'otter', 'bison', 'sheep', 'mouse',
+  'river', 'ocean', 'shore', 'beach', 'desert', 'valley', 'canyon',
+  'plain', 'field', 'meadow', 'grove', 'cliff', 'hills', 'mount',
+  'world', 'solar', 'lunar', 'space', 'orbit', 'stars', 'dawn',
+  'dusk', 'floor', 'round', 'until', 'since', 'hence', 'maybe',
 ];
 
 export const useTypingTest = (onComplete) => {
   const [timeLimit, setTimeLimitState] = useState(30);
   const [timeRemaining, setTimeRemaining] = useState(30);
+  const [isActive, setIsActive] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
@@ -38,19 +47,25 @@ export const useTypingTest = (onComplete) => {
   const [typedWords, setTypedWords] = useState([]);
 
   const inputRef = useRef(null);
+  const lastKeystrokeRef = useRef(0);
   const correctCharsRef = useRef(0);
   const totalCharsRef = useRef(0);
 
   useEffect(() => { correctCharsRef.current = correctChars; }, [correctChars]);
   useEffect(() => { totalCharsRef.current = totalChars; }, [totalChars]);
 
-  const generateWords = useCallback((count = 500) => {
+  const generateWords = useCallback((count = 1000) => {
     const generated = [];
     for (let i = 0; i < count; i++) {
       generated.push(COMMON_WORDS[Math.floor(Math.random() * COMMON_WORDS.length)]);
     }
     return generated;
   }, []);
+
+  const generateMoreWords = useCallback(() => {
+    const newWords = generateWords(500);
+    setWords(prev => [...prev, ...newWords]);
+  }, [generateWords]);
 
   useEffect(() => {
     setWords(generateWords());
@@ -63,6 +78,7 @@ export const useTypingTest = (onComplete) => {
         setTimeRemaining(prev => {
           const newTime = prev - 1;
           if (newTime === 0) {
+            setIsActive(false);
             const wpm = Math.round((correctCharsRef.current / 5) / (timeLimit / 60));
             const accuracy = totalCharsRef.current > 0
               ? Math.round((correctCharsRef.current / totalCharsRef.current) * 100)
@@ -84,10 +100,13 @@ export const useTypingTest = (onComplete) => {
   const startTest = useCallback(() => {
     if (!hasStarted) {
       setHasStarted(true);
+      setIsActive(true);
+      lastKeystrokeRef.current = Date.now();
     }
   }, [hasStarted]);
 
   const resetTest = useCallback(() => {
+    setIsActive(false);
     setHasStarted(false);
     setTimeRemaining(timeLimit);
     setCurrentWordIndex(0);
@@ -102,20 +121,60 @@ export const useTypingTest = (onComplete) => {
 
   const setTimeLimit = useCallback((newLimit) => {
     setTimeLimitState(newLimit);
-    if (!hasStarted) {
-      setTimeRemaining(newLimit);
-    }
+    if (!hasStarted) setTimeRemaining(newLimit);
   }, [hasStarted]);
+
+  const handleInputChange = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.innerWidth > 768) return;
+
+    const value = e.target.value;
+    if (!value) return;
+    const lastChar = value[value.length - 1];
+    if (!lastChar) return;
+
+    if (!hasStarted) startTest();
+    lastKeystrokeRef.current = Date.now();
+
+    if (currentWordIndex >= words.length - 100) generateMoreWords();
+
+    if (lastChar !== ' ') {
+      const newInput = userInput + lastChar;
+      setUserInput(newInput);
+      setCurrentCharIndex(prev => prev + 1);
+      setTotalChars(prev => prev + 1);
+      const currentWord = words[currentWordIndex];
+      if (currentWord && currentCharIndex < currentWord.length && lastChar === currentWord[currentCharIndex]) {
+        setCorrectChars(prev => prev + 1);
+      }
+    } else {
+      setTypedWords(prev => {
+        const n = [...prev];
+        n[currentWordIndex] = userInput;
+        return n;
+      });
+      if (currentWordIndex < words.length - 1) {
+        setCurrentWordIndex(prev => prev + 1);
+        setCurrentCharIndex(0);
+        setUserInput('');
+      }
+    }
+    setTimeout(() => { if (e.target) e.target.value = ''; }, 0);
+  }, [hasStarted, startTest, currentWordIndex, currentCharIndex, userInput, words, generateMoreWords]);
 
   const handleKeyPress = useCallback((e) => {
     if (!hasStarted) startTest();
+    lastKeystrokeRef.current = Date.now();
+
+    if (currentWordIndex >= words.length - 100) generateMoreWords();
 
     if (e.key === ' ') {
       e.preventDefault();
       setTypedWords(prev => {
-        const newTypedWords = [...prev];
-        newTypedWords[currentWordIndex] = userInput;
-        return newTypedWords;
+        const n = [...prev];
+        n[currentWordIndex] = userInput;
+        return n;
       });
       if (currentWordIndex < words.length - 1) {
         setCurrentWordIndex(prev => prev + 1);
@@ -124,7 +183,17 @@ export const useTypingTest = (onComplete) => {
       }
     } else if (e.key === 'Backspace') {
       e.preventDefault();
-      if (currentCharIndex > 0) {
+      if (currentCharIndex === 0 && currentWordIndex > 0) {
+        setTypedWords(prev => {
+          const n = [...prev];
+          n[currentWordIndex] = userInput;
+          return n;
+        });
+        const newWordIndex = currentWordIndex - 1;
+        setCurrentWordIndex(newWordIndex);
+        setCurrentCharIndex(words[newWordIndex]?.length || 0);
+        setUserInput(typedWords[newWordIndex] || '');
+      } else if (currentCharIndex > 0) {
         setCurrentCharIndex(prev => prev - 1);
         setUserInput(prev => prev.slice(0, -1));
       }
@@ -138,20 +207,11 @@ export const useTypingTest = (onComplete) => {
         setCorrectChars(prev => prev + 1);
       }
     }
-  }, [hasStarted, startTest, currentWordIndex, currentCharIndex, userInput, words]);
+  }, [hasStarted, startTest, currentWordIndex, currentCharIndex, userInput, words, generateMoreWords, typedWords]);
 
   return {
-    timeLimit,
-    timeRemaining,
-    hasStarted,
-    currentWordIndex,
-    currentCharIndex,
-    userInput,
-    words,
-    typedWords,
-    setTimeLimit,
-    resetTest,
-    handleKeyPress,
-    inputRef,
+    timeLimit, timeRemaining, isActive, hasStarted,
+    currentWordIndex, currentCharIndex, userInput, words, typedWords,
+    setTimeLimit, startTest, resetTest, handleKeyPress, handleInputChange, inputRef,
   };
 };

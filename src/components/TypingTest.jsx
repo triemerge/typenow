@@ -1,29 +1,22 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RotateCcw } from 'lucide-react';
+import { Play, RotateCcw } from 'lucide-react';
 import { TypingDisplay } from './TypingDisplay';
 import { useTypingTest } from '@/hooks/useTypingTest';
 
 export const TypingTest = ({ onComplete }) => {
   const {
-    timeLimit,
-    timeRemaining,
-    hasStarted,
-    currentWordIndex,
-    currentCharIndex,
-    userInput,
-    words,
-    typedWords,
-    setTimeLimit,
-    resetTest,
-    handleKeyPress,
-    inputRef,
+    timeLimit, timeRemaining, hasStarted,
+    currentWordIndex, currentCharIndex, userInput, words, typedWords,
+    setTimeLimit, resetTest, handleKeyPress, handleInputChange, inputRef,
   } = useTypingTest(onComplete);
 
   const handleTimeLimitChange = (value) => {
     setTimeLimit(parseInt(value));
   };
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
@@ -51,7 +44,7 @@ export const TypingTest = ({ onComplete }) => {
         </Button>
       </div>
 
-      <div onClick={() => inputRef.current?.focus()} className="cursor-text">
+      <div onClick={() => inputRef.current?.focus()} className="cursor-text relative">
         <TypingDisplay
           words={words}
           currentWordIndex={currentWordIndex}
@@ -62,18 +55,31 @@ export const TypingTest = ({ onComplete }) => {
 
         <input
           ref={inputRef}
-          className="opacity-0 absolute"
+          className="absolute opacity-0 pointer-events-none focus:outline-none"
           onKeyDown={handleKeyPress}
-          autoFocus
+          onChange={handleInputChange}
+          autoFocus={!isMobile}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck={false}
+          disabled={timeRemaining === 0}
+          inputMode="text"
+          style={{
+            width: '1px', height: '1px', border: 'none', outline: 'none',
+            backgroundColor: 'transparent', color: 'transparent',
+            overflow: 'hidden', left: 0, top: 0,
+          }}
         />
       </div>
 
       {!hasStarted && (
-        <p className="text-center text-muted-foreground/60 text-sm">start typing to begin</p>
+        <div className="text-center">
+          <p className="flex items-center justify-center gap-2 text-muted-foreground/60">
+            <Play size={14} />
+            <span className="text-sm">Start typing to begin the test</span>
+          </p>
+        </div>
       )}
     </div>
   );
