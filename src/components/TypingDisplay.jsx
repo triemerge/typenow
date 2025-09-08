@@ -62,12 +62,12 @@ export const TypingDisplay = ({
     return lines.length - 1;
   }, [lines, currentWordIndex]);
 
-  const renderWord = (word, globalWordIndex) => {
+  const renderWord = (word, globalWordIndex, isInCurrentLine) => {
     const isCurrentWord = globalWordIndex === currentWordIndex;
 
     if (isCurrentWord) {
       return (
-        <span key={globalWordIndex} className="px-1 bg-primary/10 rounded">
+        <span key={globalWordIndex} className={`relative px-1 ${isInCurrentLine ? 'bg-primary/10 rounded' : ''}`}>
           {word.split('').map((char, charIndex) => {
             let className = 'text-dim';
             if (charIndex < userInput.length) {
@@ -112,7 +112,7 @@ export const TypingDisplay = ({
       >
         {line.map((word, wordIndexInLine) => {
           const globalWordIndex = startWordIndex + wordIndexInLine;
-          return renderWord(word, globalWordIndex);
+          return renderWord(word, globalWordIndex, isCurrentLine, wordIndexInLine);
         })}
       </div>
     );
@@ -153,6 +153,10 @@ export const TypingDisplay = ({
             </div>
           </div>
         </div>
+
+        {/* Visual indicators for sections */}
+        <div className="absolute left-0 top-1/3 right-0 h-px bg-accent/20 pointer-events-none" />
+        <div className="absolute left-0 top-2/3 right-0 h-px bg-accent/20 pointer-events-none" />
       </div>
     </div>
   );
