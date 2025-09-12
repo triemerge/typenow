@@ -67,7 +67,7 @@ const Index = () => {
         onViewProgress={handleViewProgress}
       />
 
-      <main className="flex-1 container max-w-6xl mx-auto px-4 py-8">
+      <main className="flex-1 container max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {currentState === 'test' && (
           <div className="space-y-8">
             <StatsCards results={savedResults} />
