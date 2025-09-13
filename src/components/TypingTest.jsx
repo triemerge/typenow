@@ -13,7 +13,8 @@ export const TypingTest = ({ onComplete }) => {
   } = useTypingTest(onComplete);
 
   const handleTimeLimitChange = (value) => {
-    setTimeLimit(parseInt(value));
+    const newLimit = parseInt(value);
+    setTimeLimit(newLimit);
   };
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
@@ -76,8 +77,9 @@ export const TypingTest = ({ onComplete }) => {
       {!hasStarted && (
         <div className="text-center">
           <p className="flex items-center justify-center gap-2 text-muted-foreground/60">
-            <Play size={14} />
-            <span className="text-sm">Start typing to begin the test</span>
+            <Play size={14} className="sm:size-4" />
+            <span className="hidden sm:inline text-sm">Start typing to begin the test</span>
+            <span className="sm:hidden text-xs">Tap above to start typing</span>
           </p>
         </div>
       )}
