@@ -30,6 +30,7 @@ export const TypingDisplay = ({
     }
   };
 
+  // Split words into lines based on character count
   const lines = useMemo(() => {
     const charLimit = getCharLimit();
     const result = [];
@@ -40,6 +41,7 @@ export const TypingDisplay = ({
       const wordWithSpace = currentLine.length === 0 ? word : ` ${word}`;
       const wordLength = wordWithSpace.length;
 
+      // If adding this word would exceed the limit, start a new line
       if (currentLineLength + wordLength > charLimit && currentLine.length > 0) {
         result.push([...currentLine]);
         currentLine = [word];
@@ -49,10 +51,16 @@ export const TypingDisplay = ({
         currentLineLength += wordLength;
       }
     }
-    if (currentLine.length > 0) result.push(currentLine);
+
+    // Add the last line if it has words
+    if (currentLine.length > 0) {
+      result.push(currentLine);
+    }
+
     return result;
   }, [words, screenSize]);
 
+  // Calculate current line and position within line
   const currentLineIndex = useMemo(() => {
     let totalWords = 0;
     for (let i = 0; i < lines.length; i++) {
@@ -62,20 +70,40 @@ export const TypingDisplay = ({
     return lines.length - 1;
   }, [lines, currentWordIndex]);
 
-  const renderWord = (word, globalWordIndex, isInCurrentLine) => {
+  const currentWordInLine = useMemo(() => {
+    let totalWords = 0;
+    for (let i = 0; i < currentLineIndex; i++) {
+      totalWords += lines[i].length;
+    }
+    return currentWordIndex - totalWords;
+  }, [lines, currentLineIndex, currentWordIndex]);
+
+  // Calculate vertical offset to keep current line in middle section
+  const offsetLines = Math.max(0, currentLineIndex - 1);
+
+  const renderWord = (word, globalWordIndex, isInCurrentLine, wordIndexInLine) => {
     const isCurrentWord = globalWordIndex === currentWordIndex;
 
     if (isCurrentWord) {
       return (
-        <span key={globalWordIndex} className={`relative px-1 ${isInCurrentLine ? 'bg-primary/10 rounded' : ''}`}>
+        <span
+          key={globalWordIndex}
+          className={`relative px-1 ${isInCurrentLine ? 'bg-primary/10 rounded' : ''}`}
+        >
           {word.split('').map((char, charIndex) => {
             let className = 'text-dim';
             if (charIndex < userInput.length) {
-              className = userInput[charIndex] === char ? 'text-correct' : 'text-incorrect';
+              className = userInput[charIndex] === char
+                ? 'text-correct'
+                : 'text-incorrect';
             } else if (charIndex === currentCharIndex) {
-              className = 'text-dim border-b-2 border-primary';
+              className = 'text-dim border-b-2 border-primary transform transition-transform duration-100 ease-out';
             }
-            return <span key={charIndex} className={className}>{char}</span>;
+            return (
+              <span key={charIndex} className={`${className} transition-all duration-100 ease-out`}>
+                {char}
+              </span>
+            );
           })}
         </span>
       );
@@ -122,12 +150,17 @@ export const TypingDisplay = ({
     <div className="w-full max-w-4xl mx-auto">
       <div
         className="relative bg-background border border-border rounded-lg overflow-hidden"
-        style={{ height: screenSize === 'mobile' ? '35vh' : '40vh', minHeight: screenSize === 'mobile' ? '280px' : '300px' }}
+        style={{
+          height: screenSize === 'mobile' ? '35vh' : '40vh',
+          minHeight: screenSize === 'mobile' ? '280px' : '300px'
+        }}
       >
+        {/* Three sections container */}
         <div className="absolute inset-0 flex flex-col">
-          <div className="flex-1 p-4 sm:p-8 overflow-hidden">
+          {/* Top section - completed lines */}
+          <div className="flex-1 p-4 sm:p-6 md:p-8 overflow-hidden">
             <div className="h-full flex items-center">
-              <div className="text-2xl font-mono leading-relaxed w-full overflow-hidden">
+              <div className="text-2xl lg:text-2xl font-mono leading-relaxed w-full overflow-hidden">
                 {currentLineIndex > 0 && lines[currentLineIndex - 1] &&
                   renderLine(lines[currentLineIndex - 1], currentLineIndex - 1)
                 }
@@ -135,17 +168,19 @@ export const TypingDisplay = ({
             </div>
           </div>
 
-          <div className="flex-1 p-4 sm:p-8 bg-accent/5 border-y border-accent/20">
+          {/* Middle section - current line */}
+          <div className="flex-1 p-4 sm:p-6 md:p-8 bg-accent/5 border-y border-accent/20">
             <div className="h-full flex items-center">
-              <div className="text-2xl font-mono leading-relaxed w-full overflow-hidden">
+              <div className="text-2xl lg:text-2xl font-mono leading-relaxed w-full overflow-hidden">
                 {lines[currentLineIndex] && renderLine(lines[currentLineIndex], currentLineIndex)}
               </div>
             </div>
           </div>
 
-          <div className="flex-1 p-4 sm:p-8 overflow-hidden">
+          {/* Bottom section - upcoming lines */}
+          <div className="flex-1 p-4 sm:p-6 md:p-8 overflow-hidden">
             <div className="h-full flex items-center">
-              <div className="text-2xl font-mono leading-relaxed w-full overflow-hidden">
+              <div className="text-2xl lg:text-2xl font-mono leading-relaxed w-full overflow-hidden">
                 {lines[currentLineIndex + 1] &&
                   renderLine(lines[currentLineIndex + 1], currentLineIndex + 1)
                 }
