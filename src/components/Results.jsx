@@ -34,6 +34,10 @@ export const Results = ({
         if (value >= 95) return 'success';
         if (value >= 80) return 'warning';
         return 'error';
+      case 'consistency':
+        if (value >= 90) return 'success';
+        if (value >= 70) return 'warning';
+        return 'error';
       default:
         return 'primary';
     }
@@ -51,6 +55,11 @@ export const Results = ({
         if (value >= 90) return 'Good';
         if (value >= 80) return 'Fair';
         return 'Needs Work';
+      case 'consistency':
+        if (value >= 90) return 'Very Steady';
+        if (value >= 70) return 'Steady';
+        if (value >= 50) return 'Variable';
+        return 'Inconsistent';
       default:
         return '';
     }
@@ -60,6 +69,11 @@ export const Results = ({
     wpm: { label: "WPM", color: "hsl(var(--primary))" },
     accuracy: { label: "Accuracy", color: "hsl(var(--accent))" },
   };
+
+  // Calculate consistency from accuracy and error ratio
+  const consistency = results.totalChars > 0
+    ? Math.round((results.correctChars / results.totalChars) * 100)
+    : 0;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in px-2 sm:px-4">
