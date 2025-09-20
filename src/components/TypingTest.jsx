@@ -44,9 +44,8 @@ export const TypingTest = ({ onComplete }) => {
             </SelectContent>
           </Select>
 
-          {/* Oops, displayed seconds only without leading zero */}
           <div className="text-2xl font-bold text-primary">
-            {timeRemaining}s
+            {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
           </div>
         </div>
 
