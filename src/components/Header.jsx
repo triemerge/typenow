@@ -14,10 +14,10 @@ export const Header = ({
         {/* Mobile Header */}
         <div className="flex items-center justify-between sm:hidden">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-md shadow-primary/25">
               <Keyboard className="h-4 w-4 text-primary-foreground" />
             </div>
-            <h1 className="text-lg font-bold text-foreground">TypeNow</h1>
+            <h1 className="text-lg font-bold text-foreground tracking-tight">TypeNow</h1>
           </div>
 
           <div className="flex items-center gap-1">
@@ -48,7 +48,7 @@ export const Header = ({
               <Keyboard className="h-6 w-6 text-primary-foreground" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold text-foreground">TypeNow</h1>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">TypeNow</h1>
             </div>
           </div>
 
