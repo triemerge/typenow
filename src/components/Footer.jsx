@@ -1,6 +1,8 @@
 import React from 'react';
 
 export const Footer = () => {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="mt-auto border-t border-border bg-card/50 backdrop-blur-sm">
       <div className="container max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
@@ -20,7 +22,7 @@ export const Footer = () => {
           </div>
           <div className="pt-2 border-t border-border/50 w-full">
             <p className="text-xs text-muted-foreground/60 text-center">
-              built for typing practice
+              (c) {year} Crafted with heart for typing enthusiasts
             </p>
           </div>
         </div>
