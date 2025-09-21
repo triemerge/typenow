@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Keyboard, TrendingUp } from 'lucide-react';
+import { Keyboard, TrendingUp, Settings } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const Header = ({
@@ -11,7 +11,6 @@ export const Header = ({
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
       <div className="container max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
-        {/* Mobile Header */}
         <div className="flex items-center justify-between sm:hidden">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-md shadow-primary/25">
@@ -41,7 +40,6 @@ export const Header = ({
           </div>
         </div>
 
-        {/* Desktop Header */}
         <div className="hidden sm:flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
@@ -68,7 +66,7 @@ export const Header = ({
               size="sm"
               className="gap-2 text-sm px-4 h-9 font-medium"
             >
-              <TrendingUp size={16} />
+              <Settings size={16} />
               Progress
             </Button>
           </nav>
