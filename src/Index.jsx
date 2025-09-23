@@ -37,7 +37,7 @@ const Index = () => {
       setIsResultSaved(true);
       toast({
         title: "Results Saved!",
-        description: "Your test results have been saved to track your progress.",
+        description: "Your typing results have been saved successfully.",
       });
     }
   };
@@ -69,7 +69,7 @@ const Index = () => {
 
       <main className="flex-1 container max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {currentState === 'test' && (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             <StatsCards results={savedResults} />
             <TypingTest onComplete={handleTestComplete} />
           </div>
