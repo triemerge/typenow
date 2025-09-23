@@ -46,6 +46,7 @@ export const Progress = ({
     <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-primary">Performance Analytics</h2>
           <p className="text-muted-foreground/80 font-medium tracking-wide">
             {results.length} typing session{results.length !== 1 ? 's' : ''} analyzed
           </p>
