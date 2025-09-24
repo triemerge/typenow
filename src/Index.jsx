@@ -37,7 +37,7 @@ const Index = () => {
       setIsResultSaved(true);
       toast({
         title: "Results Saved!",
-        description: "Your typnig results have been saved successfully.",
+        description: "Your test results have been saved to track your progress.",
       });
     }
   };
