@@ -1,12 +1,13 @@
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export function ThemeProvider({ children }) {
+export function ThemeProvider({ children, ...props }) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
       enableSystem
       disableTransitionOnChange
+      {...props}
     >
       {children}
     </NextThemesProvider>
