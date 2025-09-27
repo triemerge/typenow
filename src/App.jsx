@@ -5,7 +5,6 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./Index";
 import NotFound from "./NotFound";
 
-// TODO: Add error boundary for production
 const App = () => (
   <ThemeProvider>
     <Toaster />
