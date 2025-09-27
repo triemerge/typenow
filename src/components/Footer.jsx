@@ -22,7 +22,7 @@ export const Footer = () => {
           </div>
           <div className="pt-2 border-t border-border/50 w-full">
             <p className="text-xs text-muted-foreground/60 text-center">
-              (c) {year} Crafted with heart for typing enthusiasts
+              (c) {year} All rights reservd
             </p>
           </div>
         </div>
