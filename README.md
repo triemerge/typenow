@@ -14,6 +14,7 @@ A minimalist typing speed test application built with React and Tailwind CSS.
 - Fully responsive design (mobile, tablet, desktop)
 - Local storage for persisting test results
 - Performance badges based on WPM and accuracy
+- Consistency metrics
 
 ## Tech Stack
 
@@ -39,6 +40,10 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 ```bash
 npm run build
 ```
+
+## Deploy
+
+This project is configured for deployment on Vercel. Push to your repository and connect it to Vercel for automatic deployments.
 
 ## License
 
