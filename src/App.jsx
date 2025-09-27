@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Index from "./Index";
 import NotFound from "./NotFound";
 
+// TODO: Add error boundary for production
 const App = () => (
   <ThemeProvider>
     <Toaster />
@@ -12,7 +13,6 @@ const App = () => (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
